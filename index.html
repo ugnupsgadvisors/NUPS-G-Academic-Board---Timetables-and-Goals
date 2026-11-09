@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Personal Timetable and Goals</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{--p:#1D4ED8;--pd:#1E3A8A;--pl:#DBEAFE;--bg:#F1F6FD;--tx:#0F2A4A}
 [data-theme=green]{--p:#047857;--pd:#064E3B;--pl:#D1FAE5;--bg:#F0FDF4;--tx:#052E16}
@@ -94,7 +95,17 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none}
 .pic{width:84px;height:84px;border-radius:50%;overflow:hidden;background:var(--pl);color:var(--pd);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:26px;flex:none}
 .pic img{width:100%;height:100%;object-fit:cover}
 .ai{display:flex;flex-direction:column;gap:3px;font-size:14px}
-@media print{.wrap{display:none}#print{display:block;padding:8px}#print table{width:100%;border-collapse:collapse;margin-bottom:6px}#print td{border:1px solid #999;padding:4px 6px;font-size:12px}}
+@page{size:A4 landscape;margin:8mm}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:18px;background:#fff;border:1px solid var(--pl);text-decoration:none;color:inherit;min-height:116px}
+.tile .ic{font-size:28px}.tile b{color:var(--p);font-size:16px}.tile small{color:#475569;font-size:13px}
+.tile:active{background:var(--pl)}
+@media print{#print,#print *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#print .pt{table-layout:fixed;width:100%;border-collapse:collapse}
+#print .pt th,#print .pt td{border:1px solid #94A3B8;padding:3px 4px;font-size:10px;text-align:left;vertical-align:top;word-wrap:break-word}
+#print .pt th:first-child,#print .pt td:first-child{width:92px}
+#print .lg span{padding:2px 8px;border-radius:99px;margin-right:6px;font-size:10px}
+.wrap{display:none}#print{display:block;padding:8px}#print table{width:100%;border-collapse:collapse;margin-bottom:6px}#print td{border:1px solid #999;padding:4px 6px;font-size:12px}}
 </style>
 </head>
 <body>
@@ -105,19 +116,32 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none}
 <div><h1>My Personal Timetable and Goals</h1><p class="sub">Designed by the NUPSG Academic Board</p></div>
 </div>
 <div class="bar">
+<a class="btn f" id="hbtn" href="#/home" hidden>Home</a>
 <button class="btn f" id="th-b">Blue theme</button>
 <button class="btn" id="th-p">Purple theme</button>
 <button class="btn" id="th-g">Green theme</button>
-<button class="btn f" id="pdf">Download PDF</button>
-<button class="btn f" id="xlsx">Download Excel</button>
-<button class="btn" id="csv">Export CSV</button>
-<button class="btn" id="bk">Back up file</button>
-<label class="btn">Restore backup<input type="file" id="imp" accept=".json" hidden></label>
 </div>
 </header>
-
+<div class="pg" id="pg-home">
 <section class="card">
-<h2>About you</h2>
+<h2 id="hello">Welcome</h2>
+<p class="mut">Choose where you want to go. Everything you enter saves automatically on this phone.</p>
+<div class="tiles">
+<a class="tile" href="#/about"><span class="ic">👤</span><b>About me</b><small id="t-about">Your details</small></a>
+<a class="tile" href="#/goals"><span class="ic">🎯</span><b>My goals</b><small id="t-goals">Your three semester goals</small></a>
+<a class="tile" href="#/timetable"><span class="ic">🗓️</span><b>My personal timetable</b><small id="t-tt">Plan your week</small></a>
+<a class="tile" href="#/diary"><span class="ic">📓</span><b>My reflection diary</b><small id="t-diary">Write and look back</small></a>
+<a class="tile" href="#/monthly"><span class="ic">📅</span><b>Monthly summary</b><small id="t-month">Visit when you want a month in review</small></a>
+<a class="tile" href="#/send"><span class="ic">📤</span><b>Send to my advisor</b><small id="t-send">Goals, timetable and more</small></a>
+<a class="tile" href="#/contact"><span class="ic">☎️</span><b>Contact my advisor</b><small id="t-contact">Name, phone and email</small></a>
+<a class="tile" href="#/save"><span class="ic">💾</span><b>Save and download</b><small id="t-save">PDF, Excel and back-up</small></a>
+</div>
+</section>
+</div>
+<div class="pg" id="pg-about" hidden>
+<section class="card">
+<div><a class="btn" href="#/home">← Home</a></div>
+<h2>About me</h2>
 <div class="g">
 <label class="fld">Student name<input id="name" autocomplete="name"></label>
 <label class="fld">Campus<select id="campus"><option value="">Choose campus</option><option>Main Campus</option><option>City Campus</option></select></label>
@@ -127,8 +151,10 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none}
 </div>
 <p class="mut">Type the name of your hall or hostel. If you live in a hall, say whether you are in the Main hall or the Annex, for example "Akuafo Hall, Main" or "Akuafo Hall, Annex". If you stay off campus, type your hostel or area, for example "Off campus, East Legon". Campus is for your records only.</p>
 </section>
-
+</div>
+<div class="pg" id="pg-goals" hidden>
 <section class="card">
+<div><a class="btn" href="#/home">← Home</a></div>
 <h2>My three semester goals</h2>
 <p class="mut">Write each goal, then break it into small steps. Tick a step when you finish it and your progress bar moves. Your progress is saved on this device and appears in your PDF and Excel downloads.</p>
 <div class="g">
@@ -137,28 +163,13 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none}
 <div class="gc"><label class="fld">Spiritual goal (optional)<textarea id="g3" placeholder="Share it only if you choose to"></textarea></label><div class="gc" id="st-g3"></div></div>
 </div>
 </section>
-
+</div>
+<div class="pg" id="pg-timetable" hidden>
 <section class="card">
-<h2>My weekly reflection</h2>
-<p class="mut">At the end of each week, complete your reflection below and include it in your feedback if you want your advisor to review it.</p>
-<label class="fld" style="max-width:300px">My weekly review day<select id="rv"><option value="">Choose a day</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></label>
-<p class="mut">Choose one day each week to review your plan.</p>
-<label class="fld" style="max-width:260px">Week beginning<input type="date" id="rwk"></label>
-<label class="fld">End-of-week reflection for advisor check-in<textarea id="refl" placeholder="What went well this week? What will you change next week?"></textarea></label>
-<div class="dur"><button class="btn f" id="rsave">Save to my diary</button></div>
-<p class="mut" id="rmsg">Saving keeps this week in your diary on this device. It is not sent to your advisor until you tick it in the feedback section.</p>
-<details class="dd"><summary>My reflection diary</summary><div class="in" id="diary"></div></details>
-<h3 style="margin:6px 0 0">My monthly summary</h3>
-<p class="mut">At the end of the month, build a summary from your weekly entries, then edit it into a short summary of what went well, what was hard and what you will change.</p>
-<label class="fld" style="max-width:260px">Month<input type="month" id="mon"></label>
-<div class="dur"><button class="btn" id="mbuild">Build from my diary</button></div>
-<label class="fld">Monthly summary<textarea id="msum" placeholder="Your summary of the month"></textarea></label>
-</section>
-
-<section class="card">
-<h2>Weekly timetable</h2>
-<p class="mut">Create your weekly plan once and reuse it each week. Add lectures, tutorials, study sessions, meals, commuting, rest, clubs and spiritual activities. Update the week beginning date and edit entries when your classes or commitments change; you do not need to rebuild the timetable every week.</p>
-<label class="fld" style="max-width:260px">Week beginning<input type="date" id="wb"></label>
+<div><a class="btn" href="#/home">← Home</a></div>
+<h2>My personal timetable</h2>
+<p class="mut">Create your timetable once and keep using it. You only need to edit it when your classes or commitments change, so there is no need to rebuild it each week. Add lectures, tutorials, study sessions, meals, commuting, rest, clubs and spiritual activities.</p>
+<div class="dur"><button class="btn f" id="pdf2">Download PDF</button><a class="btn" href="#/send">Send to my advisor</a></div>
 <div class="note">Sleep, meals, commuting, rest, church, devotion and personal development are planning reminders. They are not forms to complete each day, and you can leave out any you prefer.</div>
 <p class="mut">Tap a box to choose an activity, or pick Other to type your own. Change a time slot's start or end at the left, or tap ✕ to delete it. Use "Show hours" to see fewer rows. On a phone, scroll sideways to see every day.</p>
 <div class="dur" style="align-items:center"><span class="mut">Show hours:</span><select id="vf" style="width:auto" aria-label="From hour"></select><span class="mut">until</span><select id="vt" style="width:auto" aria-label="Until hour"></select></div>
@@ -179,24 +190,72 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none}
 </div>
 <p class="mut" id="saved">Changes save automatically on this device.</p>
 </section>
-
+</div>
+<div class="pg" id="pg-diary" hidden>
 <section class="card">
-<h2>Ready for feedback from your advisor?</h2>
-<p class="mut">This sends only your three goals, not your timetable. Only authorised NUPS-G advisors can see them. Your spiritual goal is optional.</p>
-<p class="mut">Your goal steps and progress are included. Your weekly reflection and monthly summary are sent only if you tick them below. Once a month is enough.</p>
-<label class="fld">Support I would like (optional)<textarea id="sup" placeholder="What would you like advice or help with?"></textarea></label>
-<label class="chk"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><input type="checkbox" id="sp" style="width:auto;min-height:0"> Include my spiritual goal</span></label>
-<label class="chk"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><input type="checkbox" id="rf" style="width:auto;min-height:0"> Include my latest weekly reflection</span></label>
+<div><a class="btn" href="#/home">← Home</a></div>
+<h2>My reflection diary</h2>
+<p class="mut">Write about your week, or any day, whenever you like. Each reflection is saved in your diary with its date so you can look back at it later. Nothing is sent to your advisor unless you choose to include it when you send to your advisor.</p>
+<label class="fld" style="max-width:260px">Date<input type="date" id="rwk"></label>
+<label class="fld">My reflection<textarea id="refl" placeholder="What went well? What was hard? What will you change?"></textarea></label>
+<div class="dur"><button class="btn f" id="rsave">Save to my diary</button></div>
+<p class="mut" id="rmsg"></p>
+<h3 style="margin:6px 0 0">Past entries</h3>
+<div id="diary" style="display:flex;flex-direction:column;gap:10px"></div>
+</section>
+</div>
+<div class="pg" id="pg-monthly" hidden>
+<section class="card">
+<div><a class="btn" href="#/home">← Home</a></div>
+<h2>Monthly summary</h2>
+<p class="mut">Visit this page at the end of a month if you want to. Pick the month, build a summary from your diary entries, then edit it into a short summary of what went well, what was hard and what you will change. You can include it when you send to your advisor.</p>
+<label class="fld" style="max-width:260px">Month<input type="month" id="mon"></label>
+<div class="dur"><button class="btn" id="mbuild">Build from my diary</button></div>
+<label class="fld">Monthly summary<textarea id="msum" placeholder="Your summary of the month"></textarea></label>
+<div><a class="btn f" href="#/send">Send to my advisor</a></div>
+</section>
+</div>
+<div class="pg" id="pg-send" hidden>
+<section class="card">
+<div><a class="btn" href="#/home">← Home</a></div>
+<h2>Send to my advisor</h2>
+<p class="mut">Choose what to send, then choose how. Only authorised NUPS-G advisors read what you send. Your three goals and your progress are always included.</p>
+<label class="chk"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><input type="checkbox" id="tt" checked style="width:auto;min-height:0"> Include my timetable in the PDF</span></label>
+<label class="chk"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><input type="checkbox" id="sp" style="width:auto;min-height:0"> Include my spiritual goal (optional)</span></label>
+<label class="chk"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><input type="checkbox" id="rf" style="width:auto;min-height:0"> Include my latest reflection</span></label>
 <label class="chk"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><input type="checkbox" id="ms" style="width:auto;min-height:0"> Include my monthly summary</span></label>
-<button class="btn f" id="sub">Submit my goals for feedback</button>
+<label class="fld">Support I would like (optional)<textarea id="sup" placeholder="What would you like advice or help with?"></textarea></label>
+<h3 style="margin:6px 0 0">Step 1: make your PDF</h3>
+<p class="mut">Your PDF shows your timetable in colour and your goals, with whatever you ticked above.</p>
+<div class="dur"><button class="btn f" id="sd-pdf">Download my PDF</button></div>
+<h3 style="margin:6px 0 0">Step 2: send it</h3>
+<div class="dur"><button class="btn f" id="sub">Open the Google Form</button><button class="btn f" id="sd-mail">Email my PDF</button></div>
+<p class="mut">Google Form: your goals summary is copied. Paste it in, then tap Add file and choose your PDF from Downloads. Email: your phone's share menu opens with the PDF attached. Choose your email app and send it to ugnupsgadvisors@gmail.com.</p>
 <div id="conf" hidden class="note">
 <p id="confmsg" style="margin:0 0 8px"></p>
 <textarea id="sum" readonly></textarea>
 </div>
 </section>
-<section class="card" id="contact"><h2>Contact your advisor</h2><p class="mut">Questions about your goals or your timetable? Contact your advisor directly.</p><div id="adv-list" style="display:flex;flex-wrap:wrap;gap:14px"></div></section>
+</div>
+<div class="pg" id="pg-contact" hidden>
+<section class="card" id="contact">
+<div><a class="btn" href="#/home">← Home</a></div><h2>Contact your advisor</h2><p class="mut">Questions about your goals or your timetable? Contact your advisor directly.</p><div id="adv-list" style="display:flex;flex-wrap:wrap;gap:14px"></div></section>
+</div>
+<div class="pg" id="pg-save" hidden>
+<section class="card">
+<div><a class="btn" href="#/home">← Home</a></div>
+<h2>Save and download</h2>
+<p class="mut">Your timetable, goals and diary save automatically on this phone. Download a copy to keep, print or share.</p>
+<div class="dur"><button class="btn f" id="pdf">Download PDF</button><button class="btn f" id="xlsx">Download Excel</button><button class="btn" id="csv">Export CSV</button><button class="btn" id="prt">Print</button></div>
+<p class="mut">The PDF is a file with your timetable in colour, your goals and your diary. Print opens the print window if you want a paper copy.</p>
+<h3 style="margin:6px 0 0">Back up</h3>
+<p class="mut">A back-up file lets you move everything to a new phone.</p>
+<div class="dur"><button class="btn" id="bk">Back up file</button><label class="btn">Restore backup<input type="file" id="imp" accept=".json" hidden></label></div>
+</section>
+</div>
 <footer>Designed by the NUPSG Academic Board · National Union of Presbyterian Students-Ghana, University of Ghana Local</footer>
 </div>
+
 <div class="wrap" id="adv" hidden>
 <header>
 <div class="hd"><div><h1>Advisor dashboard</h1><p class="sub">NUPS-G Academic Board · advisor only</p></div></div>
@@ -233,7 +292,7 @@ const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 function theme(t){S.theme=t;document.documentElement.dataset.theme=t;[["b","blue"],["p","purple"],["g","green"]].forEach(a=>{$("th-"+a[0]).className="btn"+(t==a[1]?" f":"")});save()}
 $("th-b").onclick=()=>theme("blue");$("th-p").onclick=()=>theme("purple");$("th-g").onclick=()=>theme("green");
 
-[["name","p"],["campus","p"],["prog","p"],["level","p"],["wb","p"],["res","p"],["rv","p"],["sup","p"],["rwk","p"],["mon","p"],["g1","g"],["g2","g"],["g3","g"]].forEach(([id,o])=>{
+[["name","p"],["campus","p"],["prog","p"],["level","p"],["res","p"],["sup","p"],["mon","p"],["g1","g"],["g2","g"],["g3","g"]].forEach(([id,o])=>{
   const el=$(id);el.value=S[o][id]||"";el.addEventListener("input",()=>{S[o][id]=el.value;save()})});
 $("msum").value=S.ms||"";$("msum").addEventListener("input",e=>{S.ms=e.target.value;save()});
 $("refl").value=S.r;$("refl").addEventListener("input",e=>{S.r=e.target.value;save()});
@@ -332,15 +391,19 @@ function steps(){
       +`<div><button class="btn" data-as="${k}">＋ Add a step</button></div>`;
   });
 }
+let editId=null;
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmtD=s=>{const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(s||"");return m?(+m[3])+" "+MON[+m[2]-1]+" "+m[1]:(s||"")};
+function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function diary(){
-  const L=S.diary.slice().sort((a,b)=>(b.wk||"").localeCompare(a.wk||""));
-  $("diary").innerHTML=L.length?L.map(e=>`<div class="de"><b>Week beginning ${esc(e.wk)}</b>${e.day?`<span class="mut">Review day: ${esc(e.day)}</span>`:""}<div class="dt">${esc(e.text)}</div><div class="dur"><button class="btn" data-de="${esc(e.id)}">Edit</button><button class="btn" data-dd="${esc(e.id)}">Delete</button></div></div>`).join(""):'<p class="mut">Nothing saved yet. Your weekly reflections will appear here so you can look back at them.</p>';
+  const L=S.diary.slice().sort((a,b)=>(b.wk||"").localeCompare(a.wk||"")||(b.at||0)-(a.at||0));
+  $("diary").innerHTML=L.length?L.map(e=>`<div class="de"><b>${esc(fmtD(e.wk))}</b><div class="dt">${esc(e.text)}</div><div class="dur"><button class="btn" data-de="${esc(e.id)}">Edit</button><button class="btn" data-dd="${esc(e.id)}">Delete</button></div></div>`).join(""):'<p class="mut">Nothing saved yet. Your reflections will appear here so you can look back at them.</p>';
 }
 document.addEventListener("click",ev=>{
   const t=ev.target;
   if(t.dataset.as){const k=t.dataset.as;S.gs[k].push({t:"",d:false});save();steps();const L=document.querySelectorAll("#st-"+k+" input[data-st]");if(L.length)L[L.length-1].focus()}
   else if(t.dataset.ds){const a=t.dataset.ds.split(":");S.gs[a[0]].splice(+a[1],1);save();steps()}
-  else if(t.dataset.de){const e=S.diary.find(x=>x.id==t.dataset.de);if(e){$("rwk").value=S.p.rwk=e.wk;$("refl").value=S.r=e.text;$("rv").value=S.p.rv=e.day||"";save();$("rmsg").textContent="Editing the week beginning "+e.wk+". Tap Save to my diary when you are done.";$("refl").focus()}}
+  else if(t.dataset.de){const e=S.diary.find(x=>x.id==t.dataset.de);if(e){editId=e.id;$("rwk").value=e.wk;$("refl").value=S.r=e.text;save();$("rmsg").textContent="Editing your entry from "+fmtD(e.wk)+". Tap Save to my diary when you are done.";$("refl").focus()}}
   else if(t.dataset.dd){if(confirm("Delete this diary entry?")){S.diary=S.diary.filter(x=>x.id!=t.dataset.dd);save();diary()}}
 });
 document.addEventListener("change",ev=>{const t=ev.target;if(t.dataset.c){const a=t.dataset.c.split(":");S.gs[a[0]][+a[1]].d=t.checked;save();steps()}});
@@ -348,19 +411,16 @@ document.addEventListener("input",ev=>{const t=ev.target;if(t.dataset.st){const 
 $("rsave").onclick=()=>{
   const text=$("refl").value.trim();
   if(!text){$("rmsg").textContent="Write your reflection first.";return}
-  const wk=$("rwk").value||S.p.wb||new Date().toISOString().slice(0,10);
-  const i=S.diary.findIndex(x=>x.wk==wk);
-  if(i>=0&&!confirm("You already saved a reflection for the week beginning "+wk+". Replace it?"))return;
-  const e={id:i>=0?S.diary[i].id:rid(),wk,day:$("rv").value,text,at:Date.now()};
-  if(i>=0)S.diary[i]=e;else S.diary.push(e);
-  S.r="";$("refl").value="";save();diary();
-  $("rmsg").textContent="Saved to your diary for the week beginning "+wk+". You can look back at it any time.";
+  const wk=$("rwk").value||todayStr(),e0=editId&&S.diary.find(x=>x.id==editId);
+  if(e0){e0.wk=wk;e0.text=text}else S.diary.push({id:rid(),wk,text,at:Date.now()});
+  editId=null;S.r="";$("refl").value="";$("rwk").value=todayStr();save();diary();
+  $("rmsg").textContent="Saved to your diary on "+fmtD(wk)+". You can look back at it any time.";
 };
 $("mbuild").onclick=()=>{
   const m=$("mon").value;if(!m)return alert("Choose the month first.");
   const L=S.diary.filter(e=>(e.wk||"").indexOf(m)==0).sort((a,b)=>a.wk.localeCompare(b.wk));
-  if(!L.length)return alert("You have no diary entries with a week beginning in that month yet.");
-  const t=L.map(e=>"Week beginning "+e.wk+": "+e.text).join("\n\n");
+  if(!L.length)return alert("You have no diary entries dated in that month yet.");
+  const t=L.map(e=>fmtD(e.wk)+": "+e.text).join("\n\n");
   $("msum").value=S.ms=t;save();
 };
 const ADVISORS=[
@@ -383,45 +443,146 @@ $("csv").onclick=()=>{
   S.rows.forEach(r=>DAYS.forEach(d=>{const c=r.cells[d];if(c&&c.t)rows.push([d,r.s,r.e,c.t])}));
   dl("nupsg-timetable.csv",new Blob(["\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n")],{type:"text/csv"}));
 };
-$("xlsx").onclick=()=>{
-  if(!window.XLSX)return alert("The Excel tool did not load. Check your internet connection and try again.");
+function buildWB(){
+  if(!window.XLSX){alert("The Excel tool did not load. Check your internet connection and try again.");return null}
   const p=S.p,wb=XLSX.utils.book_new();
-  const w=(ws,c)=>{ws["!cols"]=c.map(x=>({wch:x}));return ws};
-  XLSX.utils.book_append_sheet(wb,w(XLSX.utils.aoa_to_sheet([["Name",p.name||""],["Campus",p.campus||""],["Residence",p.res||""],["Programme",p.prog||""],["Level",p.level||""],[],["Semester academic goal",S.g.g1||""],["Semester personal development goal",S.g.g2||""],["Semester spiritual goal",S.g.g3||""],[],["Support needed",p.sup||""],["Weekly review day",p.rv||""],["Monthly summary, "+(p.mon||""),S.ms||""]]),[36,70]),"About me");
-  XLSX.utils.book_append_sheet(wb,w(XLSX.utils.aoa_to_sheet([["Time",...DAYS],...S.rows.map(r=>[r.s+" - "+r.e,...DAYS.map(d=>cellTxt(r.cells[d]))])]),[14,...DAYS.map(()=>24)]),"Timetable");
+  const add=(a,c,n)=>{const ws=XLSX.utils.aoa_to_sheet(a);ws["!cols"]=c.map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,n)};
+  add([["Name",p.name||""],["Campus",p.campus||""],["Place of residence",p.res||""],["Programme",p.prog||""],["Level",p.level||""],[],["Semester academic goal",S.g.g1||""],["Semester personal development goal",S.g.g2||""],["Semester spiritual goal",S.g.g3||""],[],["Support needed",p.sup||""]],[36,70],"About me");
+  add([["Time",...DAYS],...S.rows.map(r=>[r.s+" - "+r.e,...DAYS.map(d=>cellTxt(r.cells[d]))])],[14,...DAYS.map(()=>24)],"Personal timetable");
   const gt=[["Goal","Step","Done"]];
   [["Academic",S.g.g1,"g1"],["Personal development",S.g.g2,"g2"],["Spiritual",S.g.g3,"g3"]].forEach(a=>{gt.push([a[0]+": "+(a[1]||""),"",""]);(S.gs[a[2]]||[]).forEach(x=>gt.push(["",x.t,x.d?"Yes":"No"]))});
-  XLSX.utils.book_append_sheet(wb,w(XLSX.utils.aoa_to_sheet(gt),[50,44,10]),"Goal tracker");
-  XLSX.utils.book_append_sheet(wb,w(XLSX.utils.aoa_to_sheet([["Week beginning","Review day","Reflection"],...S.diary.slice().sort((a,b)=>(a.wk||"").localeCompare(b.wk||"")).map(e=>[e.wk,e.day||"",e.text])]),[16,14,90]),"Reflection diary");
-  XLSX.writeFile(wb,"nupsg-timetable.xlsx");
-};
-function pr(){
-  const p=S.p;
-  $("print").innerHTML=`<h1>My Personal Timetable and Goals</h1><p>${esc(p.name)} | ${esc(p.campus)} | ${esc(p.res)} | ${esc(p.prog)} ${esc(p.level)} | Week beginning ${esc(p.wb)}</p><h3>My three semester goals</h3><p><b>Academic:</b> ${esc(S.g.g1)}<br><b>Personal development:</b> ${esc(S.g.g2)}<br><b>Spiritual:</b> ${esc(S.g.g3)}</p>`+["g1","g2","g3"].map(k=>(S.gs[k]||[]).length?`<p style="margin:2px 0">${{g1:"Academic",g2:"Personal development",g3:"Spiritual"}[k]} steps: `+S.gs[k].map(x=>(x.d?"[x] ":"[ ] ")+esc(x.t)).join("; ")+`</p>`:"").join("")
-  +`<table><tr><td><b>Time</b></td>${DAYS.map(d=>`<td><b>${d.slice(0,3)}</b></td>`).join("")}</tr>${S.rows.map(r=>`<tr><td>${esc(r.s)} to ${esc(r.e)}</td>${DAYS.map(d=>`<td>${esc(cellTxt(r.cells[d]))}</td>`).join("")}</tr>`).join("")}</table>`
-  +`<h3>Weekly reflection diary</h3>${S.diary.slice().sort((a,b)=>(a.wk||"").localeCompare(b.wk||"")).map(e=>`<p><b>Week beginning ${esc(e.wk)}:</b> ${esc(e.text)}</p>`).join("")}${S.ms?`<h3>Monthly summary (${esc(p.mon)})</h3><p>${esc(S.ms)}</p>`:""}<p style="font-size:11px">Designed by the NUPSG Academic Board</p>`;
+  add(gt,[50,44,10],"Goal tracker");
+  add([["Date","Reflection"],...S.diary.slice().sort((a,b)=>(a.wk||"").localeCompare(b.wk||"")).map(e=>[fmtD(e.wk),e.text])],[14,90],"Reflection diary");
+  if(S.ms)add([["Monthly summary"],[S.ms]],[100],"Monthly summary");
+  return wb;
 }
-$("pdf").onclick=()=>{pr();window.print()};
+$("xlsx").onclick=()=>{const wb=buildWB();if(wb)XLSX.writeFile(wb,"nupsg-timetable.xlsx")};
+function pr(){
+  const p=S.p,cs=getComputedStyle(document.documentElement),hd=cs.getPropertyValue("--pl").trim()||"#DBEAFE",hc=cs.getPropertyValue("--pd").trim()||"#1E3A8A";
+  const th=t=>`<th style="background:${hd};color:${hc}">${t}</th>`;
+  const cell=c=>c&&c.t?`<td style="background:${BG[ACT[c.t]||"o"]}">${esc(c.t)}</td>`:"<td></td>";
+  const tt=`<table class="pt"><tr>${th("Time")}${DAYS.map(d=>th(d.slice(0,3))).join("")}</tr>${visRows().map(r=>`<tr><td style="background:#F8FAFC">${f12(r.s)} - ${f12(r.e)}</td>${DAYS.map(d=>cell(r.cells[d])).join("")}</tr>`).join("")}</table>`;
+  const leg=`<p class="lg"><span style="background:${BG.a}">Academics</span><span style="background:${BG.f}">NUPS-G</span><span style="background:${BG.l}">Daily life</span><span style="background:${BG.m}">Recreation</span><span style="background:${BG.o}">Your own activity</span></p>`;
+  const steps=["g1","g2","g3"].map(k=>(S.gs[k]||[]).length?`<p style="margin:2px 0">${{g1:"Academic",g2:"Personal development",g3:"Spiritual"}[k]} steps: `+S.gs[k].map(x=>(x.d?"[x] ":"[ ] ")+esc(x.t)).join("; ")+`</p>`:"").join("");
+  $("print").innerHTML=`<h1 style="color:${hc};margin:0 0 4px">My Personal Timetable</h1><p style="margin:0 0 6px">${esc(p.name)} | ${esc(p.campus)} | ${esc(p.res)} | ${esc(p.prog)} ${esc(p.level)}</p>${tt}${leg}`
+  +`<div style="page-break-before:always"></div><h2 style="color:${hc}">My three semester goals</h2><p><b>Academic:</b> ${esc(S.g.g1)}<br><b>Personal development:</b> ${esc(S.g.g2)}<br><b>Spiritual:</b> ${esc(S.g.g3)}</p>${steps}`
+  +(S.diary.length?`<h3>My reflection diary</h3>${S.diary.slice().sort((a,b)=>(a.wk||"").localeCompare(b.wk||"")).map(e=>`<p><b>${esc(fmtD(e.wk))}:</b> ${esc(e.text)}</p>`).join("")}`:"")
+  +(S.ms?`<h3>Monthly summary (${esc(p.mon)})</h3><p>${esc(S.ms)}</p>`:"")+`<p style="font-size:11px">Designed by the NUPSG Academic Board</p>`;
+}
+function buildPDF(full){
+  const J=window.jspdf&&window.jspdf.jsPDF;if(!J)return null;
+  const doc=new J({orientation:"landscape",unit:"mm",format:"a4"}),p=S.p,W=297,H=210,M=8;
+  const cs=getComputedStyle(document.documentElement);
+  const rgb=x=>{x=String(x||"").trim().replace("#","");if(x.length==3)x=x.split("").map(c=>c+c).join("");const n=parseInt(x,16);return isNaN(n)||x.length!=6?[219,234,254]:[(n>>16)&255,(n>>8)&255,n&255]};
+  const pl=rgb(cs.getPropertyValue("--pl")),pd=rgb(cs.getPropertyValue("--pd"));
+  const T=s=>String(s==null?"":s).replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2013\u2014]/g,"-").replace(/[^\x20-\x7E\xA0-\xFF\n]/g,"");
+  const hrs=t=>{const a=String(t||"0:0").split(":"),k=+a[0]||0,m=+a[1]||0;return (k%12||12)+(m?":"+String(m).padStart(2,"0"):"")+(k>=12?"pm":"am")};
+  const info=T([p.name,p.campus,p.res,((p.prog||"")+" "+(p.level||"")).trim()].filter(Boolean).join("  |  "));
+  let y=M;
+  if(full||$("tt").checked){
+    doc.setFont("helvetica","bold");doc.setFontSize(15);doc.setTextColor(...pd);doc.text("My Personal Timetable",M,y+5);
+    doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(40,40,40);doc.text(info,M,y+11);
+    y+=15;
+    const rows=visRows(),tw=26,cw=(W-2*M-tw)/7,hh=7,rowH=Math.max(6,Math.min(11,(H-M-y-hh-10)/Math.max(rows.length,1)));
+    doc.setDrawColor(148,163,184);doc.setLineWidth(0.2);doc.setFillColor(...pl);
+    doc.rect(M,y,tw,hh,"FD");DAYS.forEach((d,i)=>doc.rect(M+tw+i*cw,y,cw,hh,"FD"));
+    doc.setFont("helvetica","bold");doc.setFontSize(8);doc.setTextColor(...pd);
+    doc.text("Time",M+2,y+4.7);DAYS.forEach((d,i)=>doc.text(d,M+tw+i*cw+2,y+4.7));
+    y+=hh;
+    rows.forEach(r=>{
+      doc.setFillColor(248,250,252);doc.rect(M,y,tw,rowH,"FD");
+      doc.setFont("helvetica","normal");doc.setFontSize(6.5);doc.setTextColor(30,30,30);
+      doc.text(hrs(r.s)+" - "+hrs(r.e),M+2,y+rowH/2+1);
+      DAYS.forEach((d,i)=>{
+        const c=r.cells[d],x=M+tw+i*cw;
+        if(c&&c.t){
+          doc.setFillColor(...rgb(BG[ACT[c.t]||"o"]));doc.rect(x,y,cw,rowH,"FD");
+          const L=doc.splitTextToSize(T(c.t),cw-3).slice(0,2);doc.setTextColor(20,20,20);
+          doc.text(L,x+1.5,L.length>1?y+rowH/2-0.4:y+rowH/2+1);
+        }else{doc.setFillColor(255,255,255);doc.rect(x,y,cw,rowH,"FD")}
+      });
+      y+=rowH;
+    });
+    y+=4;let lx=M;
+    [["Academics","a"],["NUPS-G","f"],["Daily life","l"],["Recreation","m"],["Your own activity","o"]].forEach(a=>{
+      doc.setFillColor(...rgb(BG[a[1]]));doc.rect(lx,y,4,3.2,"FD");doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(30,30,30);
+      doc.text(a[0],lx+5.5,y+2.6);lx+=doc.getTextWidth(a[0])+12;
+    });
+    doc.addPage();y=M;
+  }
+  const para=(s,size,bold,ind)=>{
+    doc.setFont("helvetica",bold?"bold":"normal");doc.setFontSize(size);
+    if(bold)doc.setTextColor(...pd);else doc.setTextColor(30,30,30);
+    const lh=size*0.3528*1.35;
+    doc.splitTextToSize(T(s),W-2*M-(ind||0)).forEach(l=>{if(y+lh>H-M){doc.addPage();y=M}doc.text(l,M+(ind||0),y+lh*0.8);y+=lh});
+    y+=1.2;
+  };
+  para("My three semester goals",15,true);if(!(full||$("tt").checked))para(info,9,false);
+  [["Academic goal",S.g.g1,"g1",true],["Personal development goal",S.g.g2,"g2",true],["Spiritual goal",S.g.g3,"g3",full||$("sp").checked]].forEach(a=>{
+    if(!a[3])return;
+    const L=S.gs[a[2]]||[],n=L.filter(x=>x.d).length;
+    para(a[0]+(L.length?" ("+n+" of "+L.length+" steps done)":""),11,true);
+    para(a[1]||"Not written yet.",10,false,3);
+    L.forEach(x=>para((x.d?"[x] ":"[  ] ")+(x.t||""),9.5,false,6));
+  });
+  if(!full&&p.sup){para("Support I would like",11,true);para(p.sup,10,false,3)}
+  if(full){
+    if(S.diary.length){para("My reflection diary",12,true);S.diary.slice().sort((a,b)=>(a.wk||"").localeCompare(b.wk||"")).forEach(e=>para(fmtD(e.wk)+": "+e.text,9.5,false,3))}
+    if(S.ms){para("Monthly summary ("+(p.mon||"")+")",12,true);para(S.ms,9.5,false,3)}
+  }else{
+    if($("rf").checked){const r=S.diary.slice().sort((a,b)=>(b.wk||"").localeCompare(a.wk||"")||(b.at||0)-(a.at||0))[0],t=(S.r||"").trim()||(r&&r.text);if(t){para("Latest reflection"+(r&&!(S.r||"").trim()?" ("+fmtD(r.wk)+")":""),12,true);para(t,9.5,false,3)}}
+    if($("ms").checked&&S.ms){para("Monthly summary ("+(p.mon||"")+")",12,true);para(S.ms,9.5,false,3)}
+  }
+  const n=doc.getNumberOfPages();
+  for(let i=1;i<=n;i++){doc.setPage(i);doc.setFont("helvetica","normal");doc.setFontSize(7);doc.setTextColor(120,120,120);doc.text("Designed by the NUPSG Academic Board",M,H-3)}
+  return doc;
+}
+const pdfName=()=>"nupsg-"+((S.p.name||"student").replace(/[^A-Za-z0-9]+/g,"-"))+"-timetable-and-goals.pdf";
+function dlPDF(full){const d=buildPDF(full);if(!d){pr();window.print();return false}d.save(pdfName());return true}
+$("pdf").onclick=$("pdf2").onclick=()=>{dlPDF(true)};
+$("prt").onclick=()=>{pr();window.print()};
 addEventListener("beforeprint",pr);
 $("bk").onclick=()=>dl("nupsg-backup.json",new Blob([JSON.stringify(S)],{type:"application/json"}));
 $("imp").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   f.text().then(t=>{try{const o=JSON.parse(t);if(!o||typeof o.d!="object")throw 0;S=Object.assign(S,o);save();location.reload()}catch(x){alert("That file is not a NUPS-G backup.")}});
 };
-$("sub").onclick=()=>{
+function ttText(){
+  const out=[];
+  DAYS.forEach(d=>{const L=[];S.rows.forEach(r=>{const c=r.cells[d];if(c&&c.t)L.push(f12(r.s)+"-"+f12(r.e)+" "+c.t)});if(L.length)out.push(d+": "+L.join("; "))});
+  return out.length?out.join("\n"):"(no activities entered yet)";
+}
+function buildText(){
   const p=S.p,pg=k=>{const L=S.gs[k]||[];return L.length?" [Progress: "+L.filter(x=>x.d).length+" of "+L.length+" steps done]":""};
-  const lat=()=>{if((S.r||"").trim())return {wk:$("rwk").value||p.wb||"",text:S.r};const d=S.diary.slice().sort((a,b)=>(b.wk||"").localeCompare(a.wk||""))[0];return d?{wk:d.wk,text:d.text}:null};
+  const lat=()=>{if((S.r||"").trim())return {wk:$("rwk").value||todayStr(),text:S.r};const d=S.diary.slice().sort((a,b)=>(b.wk||"").localeCompare(a.wk||"")||(b.at||0)-(a.at||0))[0];return d?{wk:d.wk,text:d.text}:null};
   const L=["NUPS-G check-in","Name: "+(p.name||""),"Campus: "+(p.campus||""),"Place of residence: "+(p.res||""),"Programme: "+(p.prog||"")+" "+(p.level||""),"",
     "Semester academic goal: "+(S.g.g1||"")+pg("g1"),"Semester personal development goal: "+(S.g.g2||"")+pg("g2"),
     $("sp").checked?"Semester spiritual goal: "+(S.g.g3||"")+pg("g3"):"Semester spiritual goal: not shared","Support needed: "+(p.sup||"")];
-  if($("rf").checked){const r=lat();L.push("","Weekly review day: "+(p.rv||"not set"),"Weekly reflection (week beginning "+(r?r.wk:"not set")+"): "+(r?r.text:"none yet"))}
+  if($("rf").checked){const r=lat();L.push("","Latest reflection ("+(r?fmtD(r.wk):"no date")+"): "+(r?r.text:"none yet"))}
   if($("ms").checked)L.push("","Monthly summary ("+(p.mon||"month not set")+"): "+(S.ms||"none yet"));
-  const txt=L.join("\n");
-  $("sum").value=txt;$("conf").hidden=false;
+  return L.join("\n");
+}
+function showSum(txt,msg){$("sum").value=txt;$("sum").hidden=!txt;$("conf").hidden=false;$("confmsg").textContent=msg}
+$("sub").onclick=()=>{
+  const txt=buildText(),ok=FORM_URL.indexOf("http")==0;
   try{navigator.clipboard.writeText(txt)}catch(e){}
-  const ok=FORM_URL.indexOf("http")==0;
-  $("confmsg").textContent=ok?"Your summary is copied. Paste it into the Google Form that just opened. Your timetable is not sent.":"The advisor's form link has not been added yet. Your summary is below if you need to copy it.";
+  showSum(txt,ok?"Your summary is copied. Paste it into the Google Form that just opened. Then tap Add file and choose your PDF (use Step 1 first if you have not made it).":"The form link has not been added yet. Your summary is below if you need to copy it.");
   if(ok)window.open(FORM_URL,"_blank","noopener");
+};
+$("sd-pdf").onclick=()=>{if(dlPDF(false))showSum("","Your PDF was made. Look for it in your Downloads folder, then go to Step 2.")};
+$("sd-mail").onclick=async()=>{
+  const txt=buildText(),to=ADVISORS[0].email,d=buildPDF(false);
+  try{navigator.clipboard.writeText(to)}catch(e){}
+  if(d){
+    const f=new File([d.output("arraybuffer")],pdfName(),{type:"application/pdf"});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){
+      try{await navigator.share({files:[f],title:"NUPS-G check-in: "+(S.p.name||"student"),text:txt});showSum("","Choose your email app in the share menu and send it to "+to+". The address is copied, so you can paste it.");return}
+      catch(e){if(e&&e.name=="AbortError")return}
+    }
+    d.save(pdfName());
+  }
+  showSum(txt,"Your PDF was downloaded. In the email that opens, attach it from your Downloads folder and send it to "+to+".");
+  location.href="mailto:"+to+"?subject="+encodeURIComponent("NUPS-G check-in: "+(S.p.name||"student"))+"&body="+encodeURIComponent(txt);
 };
 S.rows.forEach(r=>Object.keys(r.cells).forEach(d=>{const c=r.cells[d];if(c&&c.c!==undefined){if(!c.t)delete r.cells[d];else r.cells[d]={t:c.t}}}));
 if((S.v||0)<4){const old=S.rows;S.rows=hourly();old.forEach(r=>{const hr=Math.floor(tm(r.s)/60),t=S.rows.find(x=>Math.floor(tm(x.s)/60)==hr);if(!t)return;Object.keys(r.cells).forEach(d=>{const c=r.cells[d];if(c&&c.t&&!(t.cells[d]&&t.cells[d].t))t.cells[d]=c})});S.v=4;save()}
@@ -494,7 +655,26 @@ $("a-exp").onclick=()=>{
   const rows=[["Name","ID or email","Status","Follow-up date","Latest advisor feedback"],...A.st.map(s=>{const m=s.thread.filter(x=>x.who=="advisor").pop();return [s.name,s.sub,s.status,s.follow,m?m.text:""]})];
   dl("nupsg-advisor-tracking.csv",new Blob(["\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n")],{type:"text/csv"}));
 };
-function route(){const a=location.hash=="#advisor";$("stu").hidden=a;$("adv").hidden=!a;if(a)arender();scrollTo(0,0)}
+const PAGES=["home","about","goals","timetable","diary","monthly","send","contact","save"];
+function tiles(){
+  const n=(S.p.name||"").split(/\s+/)[0];$("hello").textContent=n?"Welcome, "+n:"Welcome";
+  const st=[].concat(S.gs.g1||[],S.gs.g2||[],S.gs.g3||[]);
+  const cnt=S.rows.reduce((a,r)=>a+DAYS.filter(d=>r.cells[d]&&r.cells[d].t).length,0);
+  $("t-about").textContent=S.p.name&&S.p.prog?"Details added":"Add your details";
+  $("t-goals").textContent=st.length?st.filter(x=>x.d).length+" of "+st.length+" steps done":"Set your three goals";
+  $("t-tt").textContent=cnt?cnt+" activities planned":"Plan your week";
+  $("t-diary").textContent=S.diary.length?S.diary.length+(S.diary.length==1?" entry":" entries"):"Write and look back";
+}
+function route(){
+  const h=location.hash.replace(/^#\/?/,""),adv=h=="advisor",pg=PAGES.indexOf(h)>=0?h:"home";
+  $("stu").hidden=adv;$("adv").hidden=!adv;
+  PAGES.forEach(x=>{$("pg-"+x).hidden=x!=pg});
+  $("hbtn").hidden=pg=="home";
+  if(adv)arender();else if(pg=="home")tiles();
+  if(pg=="diary"&&!editId)$("rwk").value=$("rwk").value||todayStr();
+  if(pg=="monthly"&&!$("mon").value){$("mon").value=S.p.mon=todayStr().slice(0,7);save()}
+  scrollTo(0,0);
+}
 $("a-back").onclick=()=>{location.hash="";route()};
 addEventListener("hashchange",route);
 theme(S.theme);render();steps();diary();advCards();route();
